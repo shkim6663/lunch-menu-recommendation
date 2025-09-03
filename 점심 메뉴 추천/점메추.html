@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>점심 메뉴 추천</title>
+    <style>
+        body {
+          font-family: "Pretendard", Arial, sans-serif;
+          background: #f9f9fb;
+          margin: 0;
+          padding: 0;
+        }
+        .container {
+          max-width: 700px;
+          margin: 40px auto;
+          padding: 30px;
+          background: white;
+          border-radius: 20px;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        h1 {
+          text-align: center;
+          margin-bottom: 30px;
+          font-size: 28px;
+          color: #333;
+        }
+        section {
+          margin-bottom: 25px;
+        }
+        label {
+          display: block;
+          margin: 8px 0 10px;
+          font-weight: bold;
+          color: #444;
+        }
+        select, input[type="text"], button {
+          width: 100%;
+          padding: 10px;
+          margin-top: 5px;
+          border-radius: 8px;
+          border: 1px solid #ddd;
+          font-size: 16px;
+        }
+        input[type="range"] {
+          width: 100%;
+        }
+        .budget-label {
+          display: flex;
+          justify-content: space-between;
+          font-size: 14px;
+          color: #666;
+        }
+        .radio-group {
+          display: flex;
+          gap: 10px;
+          flex-wrap: wrap;
+        }
+        .toggle-btn {
+          flex: 1;
+          text-align: center;
+          padding: 10px;
+          border: 2px solid #ccc;
+          border-radius: 10px;
+          cursor: pointer;
+          transition: 0.2s;
+          background: #fafafa;
+        }
+        .toggle-btn.active {
+          background: #4CAF50;
+          color: white;
+          border-color: #4CAF50;
+          font-weight: bold;
+        }
+        button {
+          background: #4CAF50;
+          color: white;
+          border: none;
+          cursor: pointer;
+          font-size: 18px;
+          transition: 0.2s;
+        }
+        button:hover {
+          background: #45a049;
+        }
+        .result {
+          margin-top: 25px;
+          padding: 20px;
+          background: #f0fdf4;
+          border-left: 6px solid #4CAF50;
+          border-radius: 10px;
+          font-weight: bold;
+          font-size: 18px;
+          color: #333;
+          text-align: center;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>🍱 오늘의 점심 메뉴 추천</h1>
+
+    <form id="menuForm">
+        <!-- 맵기 정도 -->
+        <section>
+            <label for="spicy">맵기 정도</label>
+            <select id="spicy" name="spicy">
+                <option value="전체">상관없음</option>
+                <option value="순한맛">순한맛</option>
+                <option value="보통맛">보통맛</option>
+                <option value="매운맛">매운맛</option>
+            </select>
+        </section>
+
+        <!-- 예산 -->
+        <section>
+            <label for="budget">예산</label>
+            <input type="range" id="budget" name="budget" min="5000" max="20000" step="1000" value="10000" />
+            <div class="budget-label">
+                <span>5,000원</span>
+                <span id="budgetValue">10,000원</span>
+                <span>20,000원</span>
+            </div>
+        </section>
+
+        <!-- 음식 종류 -->
+        <section>
+            <label>음식 종류</label>
+            <div class="radio-group" id="foodGroup">
+                <div class="toggle-btn" data-value="한식">한식</div>
+                <div class="toggle-btn" data-value="중식">중식</div>
+                <div class="toggle-btn" data-value="일식">일식</div>
+                <div class="toggle-btn" data-value="양식">양식</div>
+            </div>
+            <input type="hidden" id="foodType" name="foodType" required>
+        </section>
+
+        <!-- 오늘의 기분 -->
+        <section>
+            <label for="mood">오늘의 기분</label>
+            <input type="text" id="mood" name="mood" placeholder="예: 신나는, 피곤한, 우울한" />
+        </section>
+
+        <button type="submit">추천받기 🎉</button>
+    </form>
+
+    <div class="result" id="result"></div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const budgetInput = document.getElementById("budget");
+      const budgetValue = document.getElementById("budgetValue");
+      const resultDiv = document.getElementById("result");
+      const foodTypeInput = document.getElementById("foodType");
+      const foodButtons = document.querySelectorAll(".toggle-btn");
+
+      // 예산 실시간 표시
+      budgetInput.addEventListener("input", () => {
+        budgetValue.textContent = parseInt(budgetInput.value).toLocaleString() + "원";
+      });
+
+      // 토글 버튼 클릭 처리
+      foodButtons.forEach(btn => {
+        btn.addEventListener("click", () => {
+          foodButtons.forEach(b => b.classList.remove("active"));
+          btn.classList.add("active");
+          foodTypeInput.value = btn.dataset.value;
+        });
+      });
+
+      // 메뉴 데이터
+      const menuDB = {
+        "한식": [
+          { name: "김치찌개", spicy: "매운맛", price: 8000 },
+          { name: "불고기", spicy: "보통맛", price: 12000 },
+          { name: "비빔밥", spicy: "보통맛", price: 9000 },
+          { name: "삼계탕", spicy: "순한맛", price: 15000 }
+        ],
+        "중식": [
+          { name: "짜장면", spicy: "순한맛", price: 6000 },
+          { name: "짬뽕", spicy: "매운맛", price: 8000 },
+          { name: "탕수육", spicy: "순한맛", price: 13000 }
+        ],
+        "일식": [
+          { name: "초밥", spicy: "순한맛", price: 15000 },
+          { name: "라멘", spicy: "보통맛", price: 10000 },
+          { name: "돈까스", spicy: "순한맛", price: 9000 }
+        ],
+        "양식": [
+          { name: "파스타", spicy: "보통맛", price: 13000 },
+          { name: "피자", spicy: "순한맛", price: 16000 },
+          { name: "스테이크", spicy: "보통맛", price: 20000 }
+        ]
+      };
+
+      // 제출 이벤트
+      document.getElementById("menuForm").addEventListener("submit", (e) => {
+        e.preventDefault();
+
+        const spicy = document.getElementById("spicy").value;
+        const budget = parseInt(budgetInput.value);
+        const foodType = foodTypeInput.value;
+        const mood = document.getElementById("mood").value.trim();
+
+        if (!foodType) {
+          alert("음식 종류를 선택해주세요!");
+          return;
+        }
+
+        // 조건 필터링
+        let filteredMenu = menuDB[foodType].filter(item =>
+          (spicy === "전체" || item.spicy === spicy) &&
+          item.price <= budget
+        );
+
+        // 기분 조건 강화
+        if (mood.includes("피곤")) {
+          filteredMenu = filteredMenu.filter(item =>
+            item.name.includes("국") || item.name.includes("찌개") || item.name.includes("탕") || item.name.includes("라멘")
+          );
+        } else if (mood.includes("신나") || mood.includes("즐거")) {
+          filteredMenu = filteredMenu.filter(item =>
+            item.name.includes("불고기") || item.name.includes("피자") || item.name.includes("스테이크")
+          );
+        } else if (mood.includes("우울") || mood.includes("슬퍼")) {
+          filteredMenu = filteredMenu.filter(item =>
+            item.name.includes("비빔밥") || item.name.includes("초밥") || item.name.includes("돈까스")
+          );
+        }
+
+        // 결과 표시
+        if (filteredMenu.length > 0) {
+          const randomMenu = filteredMenu[Math.floor(Math.random() * filteredMenu.length)];
+          resultDiv.textContent = `추천 메뉴 👉 ${randomMenu.name} (가격 ${randomMenu.price}원 / ${randomMenu.spicy})`;
+        } else {
+          resultDiv.textContent = "😢 조건에 맞는 메뉴가 없습니다. 예산을 조정하거나 다른 조건을 선택해보세요!";
+        }
+      });
+    });
+</script>
+</body>
+</html>
