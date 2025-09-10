@@ -12,4 +12,12 @@
 
 6.추천받기 결과 확인
 
-<img width="829" height="1003" alt="스크린샷 2025-09-02 오후 8 41 08" src="https://github.com/user-attachments/assets/773f9adf-684d-49b6-a451-52455d2e4ec6" />
+
+시연영상
+
+https://github.com/user-attachments/assets/76712ea1-eff9-40e9-8c3e-5eeb22e0e265
+
+
+
+
+
